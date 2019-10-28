@@ -43,6 +43,7 @@ public class TankManager : MonoBehaviour
                 activeTank = false;
                 Stop();
                 TurnManager.instancia.ChangeTurn();
+                SendTroughClient();
             }
         }
     }
@@ -141,5 +142,14 @@ public class TankManager : MonoBehaviour
         TurnManager.instancia.ChangeTurn();
         //TurnManager.instancia.alivePlayers--;
         gameObject.SetActive(false);
+    }
+
+    void SendTroughClient()
+    {
+        TCPClient tcp = FindObjectOfType<TCPClient>();
+        tcp.clasePrueba.Health = Thealth;
+        tcp.clasePrueba.PosicionFinal = transform.position;
+        tcp.clasePrueba.rotacionFinal = transform.rotation;
+        tcp.trySendingMsg();
     }
 }

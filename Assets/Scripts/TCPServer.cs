@@ -9,6 +9,21 @@ using UnityEngine;
 
 public class TCPServer : MonoBehaviour
 {
+    [Serializable]
+    public class MssgClass
+    {
+        public float Health;
+        public Vector3 PosicionFinal, PosicionDisparo, posFinalDisparo;
+        public Quaternion rotacionFinal;
+        public bool LeDio;
+        public MssgClass()
+        {
+            PosicionFinal = PosicionDisparo = posFinalDisparo = Vector3.zero;
+            rotacionFinal = Quaternion.identity;
+            Health = 100;
+            LeDio = false;
+        }
+    }
     #region private members 	
     /// <summary> 	
     /// TCPListener to listen for incomming TCP connection 	
@@ -25,6 +40,7 @@ public class TCPServer : MonoBehaviour
     private TcpClient connectedTcpClient;
     #endregion
 
+    MssgClass clasePrueba;
     // Use this for initialization
     void Start()
     {
@@ -35,6 +51,7 @@ public class TCPServer : MonoBehaviour
         tcpListenerThread = new Thread(new ThreadStart(ListenForIncommingRequests));
         tcpListenerThread.IsBackground = true;
         tcpListenerThread.Start();
+        clasePrueba = new MssgClass();
     }
 
     // Update is called once per frame
@@ -42,7 +59,7 @@ public class TCPServer : MonoBehaviour
     {
         if (Input.GetKeyDown(KeyCode.Space))
         {
-            SendMessage();
+            //SendMessage();
         }
     }
 
@@ -54,8 +71,9 @@ public class TCPServer : MonoBehaviour
         try
         {
             // Create listener on localhost port 8052. 			
-           tcpListener = new TcpListener(IPAddress.Parse("192.168.1.82"), 82); // este es el bueno de las pruebas con el router del profe
-            
+            //tcpListener = new TcpListener(IPAddress.Parse("192.168.1.82"), 82); // este es el bueno de las pruebas con el router del profe
+            tcpListener = new TcpListener(IPAddress.Parse("127.0.0.1"), 82);
+
             tcpListener.Start();
             Debug.Log("Server is listening");
             Byte[] bytes = new Byte[1024];
@@ -75,6 +93,9 @@ public class TCPServer : MonoBehaviour
                             // Convert byte array to string message. 							
                             string clientMessage = Encoding.ASCII.GetString(incommingData);
                             Debug.Log("client message received as: " + clientMessage);
+                            clasePrueba = JsonUtility.FromJson<MssgClass>(clientMessage);
+                            //Debug.Log("server message received as: " + clientMessage);
+                            Debug.Log("Nombre: " + clasePrueba.PosicionFinal);
                         }
                     }
                 }
@@ -109,6 +130,7 @@ public class TCPServer : MonoBehaviour
                 Debug.Log("Server sent his message - should be received by client");
             }
         }
+
         catch (SocketException socketException)
         {
             Debug.Log("Socket exception: " + socketException);

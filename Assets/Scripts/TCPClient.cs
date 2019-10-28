@@ -8,6 +8,23 @@ using UnityEngine;
 
 public class TCPClient : MonoBehaviour
 {
+    [Serializable]
+    public class MssgClass
+    {
+        public float Health;
+        public Vector3 PosicionFinal, PosicionDisparo, posFinalDisparo;
+        public Quaternion rotacionFinal;
+        public bool LeDio;
+        public MssgClass()
+        {
+            PosicionFinal = PosicionDisparo = posFinalDisparo = Vector3.zero;
+            rotacionFinal = Quaternion.identity;
+            Health = 100;
+            LeDio = false;
+        }
+    }
+
+    public MssgClass clasePrueba;
     #region private members 	
     private TcpClient socketConnection;
     private Thread clientReceiveThread;
@@ -15,6 +32,7 @@ public class TCPClient : MonoBehaviour
     // Use this for initialization 
     void Start()
     {
+        clasePrueba = new MssgClass();
         ConnectToTcpServer();
     }
     // Update is called once per frame
@@ -22,7 +40,7 @@ public class TCPClient : MonoBehaviour
     {
         if (Input.GetKeyDown(KeyCode.Space))
         {
-            SendMessage();
+            //SendMessage();
         }
     }
     /// <summary> 	
@@ -48,7 +66,9 @@ public class TCPClient : MonoBehaviour
     {
         try
         {
-            socketConnection = new TcpClient("192.168.1.85", 8000);//jojo te voy a 
+            //socketConnection = new TcpClient("192.168.1.85", 8000);//jojo te voy a 
+            socketConnection = new TcpClient("127.0.0.1", 82);
+
             Byte[] bytes = new Byte[1024];
             while (true)
             {
@@ -63,7 +83,9 @@ public class TCPClient : MonoBehaviour
                         Array.Copy(bytes, 0, incommingData, 0, length);
                         // Convert byte array to string message. 						
                         string serverMessage = Encoding.ASCII.GetString(incommingData);
-                        Debug.Log("server message received as: " + serverMessage);
+                        clasePrueba = JsonUtility.FromJson<MssgClass>(serverMessage);
+                        Debug.Log("Nombre: " + clasePrueba);
+                        Debug.Log("Nombre: " + clasePrueba.posFinalDisparo);
                     }
                 }
             }
@@ -72,6 +94,11 @@ public class TCPClient : MonoBehaviour
         {
             Debug.Log("Socket exception: " + socketException);
         }
+    }
+
+    public void trySendingMsg()
+    {
+        SendMessage();
     }
     /// <summary> 	
     /// Send message to server using socket connection. 	
@@ -88,12 +115,16 @@ public class TCPClient : MonoBehaviour
             NetworkStream stream = socketConnection.GetStream();
             if (stream.CanWrite)
             {
+
+                /* Esta wea es la original
                 string clientMessage = "This is a message from one of your clients.";
+                */
+                string json = JsonUtility.ToJson(clasePrueba);
+
                 // Convert string message to byte array.                 
-                byte[] clientMessageAsByteArray = Encoding.ASCII.GetBytes(clientMessage);
+                byte[] clientMessageAsByteArray = Encoding.ASCII.GetBytes(json);
                 // Write byte array to socketConnection stream.                 
                 stream.Write(clientMessageAsByteArray, 0, clientMessageAsByteArray.Length);
-                Debug.Log("Client sent his message - should be received by server");
             }
         }
         catch (SocketException socketException)
