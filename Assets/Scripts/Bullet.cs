@@ -59,7 +59,7 @@ public class Bullet : MonoBehaviour
             }
             TurnManager.instancia.ChangeTurn();
             Debug.Log(myShooter);
-            myShooter.SendTroughClient(transform.position);
+            myShooter.sendToConnection(transform.position);
             Destroy(gameObject);
         }
     }

@@ -38,7 +38,7 @@ RenderSettings:
   m_ReflectionIntensity: 1
   m_CustomReflection: {fileID: 0}
   m_Sun: {fileID: 0}
-  m_IndirectSpecularColor: {r: 0.4514029, g: 0.5008957, b: 0.572319, a: 1}
+  m_IndirectSpecularColor: {r: 0.4514025, g: 0.5008952, b: 0.5723183, a: 1}
   m_UseRadianceAmbientProbe: 0
 --- !u!157 &3
 LightmapSettings:
@@ -323,6 +323,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 08788f4508f209340bae18710516a502, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  clasePrueba:
+    Health: 100
+    PosicionFinal: {x: 0, y: 0, z: 0}
+    PosicionDisparo: {x: 0, y: 0, z: 0}
+    posFinalDisparo: {x: 0, y: 0, z: 0}
+    rotacionFinal: {x: 0, y: 0, z: 0, w: 1}
 --- !u!4 &54311027
 Transform:
   m_ObjectHideFlags: 0
@@ -2606,6 +2612,11 @@ PrefabInstance:
       propertyPath: IAPlayer
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 195734071114916437, guid: 42ec1febccf9a9341af9bf19970326d5,
+        type: 3}
+      propertyPath: isServer
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 195734071114528856, guid: 42ec1febccf9a9341af9bf19970326d5,
         type: 3}
       propertyPath: m_LocalPosition.x
@@ -3007,6 +3018,11 @@ PrefabInstance:
     - target: {fileID: 195734071114916437, guid: 42ec1febccf9a9341af9bf19970326d5,
         type: 3}
       propertyPath: IAPlayer
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 195734071114916437, guid: 42ec1febccf9a9341af9bf19970326d5,
+        type: 3}
+      propertyPath: isServer
       value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 195734071114528856, guid: 42ec1febccf9a9341af9bf19970326d5,

@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.AI;
 
 public class TurnManager : MonoBehaviour
 {
@@ -9,14 +10,21 @@ public class TurnManager : MonoBehaviour
     List<Transform> TankTransf = new List<Transform>();
     public Vector3 offset;
 
+
     int nTanks, tankIndex=0,alivePlayers;
 
     public float TimeToMov=1.0f;
     float ValorT=0, factorMov;
 
-    bool turnedOffLine = false;
+    bool turnedOffLine = false, monitorearIA;
 
     LineRenderer ln;
+
+    //============================DataIA====================================
+    Vector3 IAshootPos, IAEndPos, IAHitPos;
+    Quaternion IARot;
+    //============================DataIA====================================
+
     void Start()
     {
         instancia = this;
@@ -43,6 +51,11 @@ public class TurnManager : MonoBehaviour
         {
             MakeLine();
         }
+
+        if (monitorearIA)
+        {
+            IAPlayerBehaviour();
+        }
         MoveCamToPos();
     }
 
@@ -55,7 +68,6 @@ public class TurnManager : MonoBehaviour
             ln.SetPosition(1, hit.point);
             
             Vector3 newDireccion = Vector3.Reflect(misTanques[tankIndex].EndCannon.forward, hit.normal);
-            //Debug.Log(misTanques[tankIndex].EndCannon.forward);
             ln.SetPosition(2, newDireccion * 5.0f+hit.point);
         }
         else
@@ -68,7 +80,7 @@ public class TurnManager : MonoBehaviour
 
     public void ChangeTurn()
     {
-        StartCoroutine(WaitASec(2.0f));
+        StartCoroutine(WaitASec(1.0f));
     }
 
     public void turnOffLine(bool state)
@@ -92,10 +104,19 @@ public class TurnManager : MonoBehaviour
             Debug.Log("CurrentTank " + tankIndex);
             misTanques[tankIndex].ActivateTank();
             turnedOffLine = false;
-            ln.enabled = true;
+            if (!misTanques[tankIndex].IAPlayer)
+            {
+                ln.enabled = true;
+            }
+            else
+            {
+                monitorearIA = true;
+            }
+            
         }
         else
         {
+
             StartCoroutine(WaitASec(0.0f));
         }
         
@@ -115,5 +136,34 @@ public class TurnManager : MonoBehaviour
         {
             transform.position = TankTransf[tankIndex].position + offset;
         }
+    }
+
+    void IAPlayerBehaviour()
+    {
+        if ((IAEndPos-TankTransf[tankIndex].position).sqrMagnitude < 1.5f)
+        {
+            misTanques[tankIndex].gameObject.GetComponent<NavMeshAgent>().isStopped=true;
+            TankTransf[tankIndex].position = IAEndPos;
+            TankTransf[tankIndex].rotation = IARot;
+            misTanques[tankIndex].Shoot();
+            monitorearIA = false;
+        }
+    }
+
+    public void SimulatePlayer( Vector3 _dest, Vector3 _cannonPos, Quaternion _rotDestino, Vector3 _bulletHit)
+    {
+        IAEndPos = _dest;
+        IAshootPos = _cannonPos;
+        IARot = _rotDestino;
+        IAHitPos = _bulletHit;
+        misTanques[tankIndex].GetComponent<NavMeshAgent>().SetDestination(_dest);
+    }
+
+    public void SimulatePlayer( Vector3 _dest, Vector3 _cannonPos, Quaternion _rotDestino)
+    {
+        IAEndPos = _dest;
+        IAshootPos = _cannonPos;
+        IARot = _rotDestino;
+        misTanques[tankIndex].GetComponent<NavMeshAgent>().SetDestination(_dest);
     }
 }

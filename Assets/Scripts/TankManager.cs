@@ -22,7 +22,7 @@ public class TankManager : MonoBehaviour
     [Range(0.1f, 2f)]
     public float gastoFuel = 0.1f;
 
-    public bool IAPlayer = false, didShoot=false;
+    public bool IAPlayer = false, didShoot=false, isServer = false;
     public int playerID = 0, Thealth = 100;
 
     void Start()
@@ -44,8 +44,7 @@ public class TankManager : MonoBehaviour
                 Stop();
                 if (!didShoot)
                 {
-                    TurnManager.instancia.ChangeTurn();
-                    SendTroughClient();
+                    sendToConnection();
                 }
             }
         }
@@ -66,8 +65,10 @@ public class TankManager : MonoBehaviour
         Direccion = -transform.forward;
     }
 
-    void Shoot()
+    public void Shoot()
     {
+        TurnManager.instancia.turnOffLine(true);
+        Combustible = 0;
         GameObject Go = Instantiate(Bullet, EndCannon.position, transform.rotation);
         Go.GetComponent<Bullet>().Shoot(EndCannon.forward,this);
     }
@@ -114,8 +115,6 @@ public class TankManager : MonoBehaviour
         if (Input.GetKeyDown(KeyCode.Space))
         {
             Shoot();
-            Combustible = 0;
-            TurnManager.instancia.turnOffLine(true);
         }
 
         Rotate();
@@ -148,11 +147,59 @@ public class TankManager : MonoBehaviour
         gameObject.SetActive(false);
     }
 
+
+    public void sendToConnection()
+    {
+        if (isServer)
+        {
+            SendThroughServer();
+        }
+        else
+        {
+            SendTroughClient();
+        }
+        TurnManager.instancia.ChangeTurn();
+    }
+
+    public void sendToConnection(Vector3 fPos)
+    {
+        if (isServer)
+        {
+            SendThroughServer(fPos);
+        }
+        else
+        {
+            SendTroughClient(fPos);
+        }
+    }
+
+    public void SendThroughServer()
+    {
+        TCPServer tcp = FindObjectOfType<TCPServer>();
+        tcp.clasePrueba.PosicionFinal = transform.position;
+        tcp.clasePrueba.rotacionFinal = transform.rotation;
+
+        tcp.clasePrueba.PosicionDisparo = EndCannon.position;
+
+        tcp.trySendingMsg();
+    }
+
+    public void SendThroughServer(Vector3 DisparoFinal)
+    {
+        TCPServer tcp = FindObjectOfType<TCPServer>();
+        tcp.clasePrueba.PosicionFinal = transform.position;
+        tcp.clasePrueba.rotacionFinal = transform.rotation;
+
+        tcp.clasePrueba.PosicionDisparo = EndCannon.position;
+        tcp.clasePrueba.posFinalDisparo = DisparoFinal;
+
+        tcp.trySendingMsg();
+    }
+
     public void SendTroughClient()
     {
         TCPClient tcp = FindObjectOfType<TCPClient>();
 
-        tcp.clasePrueba.Health = Thealth;
         tcp.clasePrueba.PosicionFinal = transform.position;
         tcp.clasePrueba.rotacionFinal = transform.rotation;
 
@@ -165,7 +212,6 @@ public class TankManager : MonoBehaviour
     {
         TCPClient tcp = FindObjectOfType<TCPClient>();
 
-        tcp.clasePrueba.Health = Thealth;
         tcp.clasePrueba.PosicionFinal = transform.position;
         tcp.clasePrueba.rotacionFinal = transform.rotation;
 

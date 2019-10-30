@@ -11,14 +11,14 @@ public class TCPClient : MonoBehaviour
     [Serializable]
     public class MssgClass
     {
-        public float Health;
+        //public float Health;
         public Vector3 PosicionFinal, PosicionDisparo, posFinalDisparo;
         public Quaternion rotacionFinal;
         public MssgClass()
         {
             PosicionFinal = PosicionDisparo = posFinalDisparo = Vector3.zero;
             rotacionFinal = Quaternion.identity;
-            Health = 100;
+            //Health = 100;
         }
     }
 
@@ -121,7 +121,8 @@ public class TCPClient : MonoBehaviour
 
                 // Convert string message to byte array.                 
                 byte[] clientMessageAsByteArray = Encoding.ASCII.GetBytes(json);
-                // Write byte array to socketConnection stream.                 
+                // Write byte array to socketConnection stream.      
+                Debug.Log("Client tryed sending msg");
                 stream.Write(clientMessageAsByteArray, 0, clientMessageAsByteArray.Length);
             }
         }

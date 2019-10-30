@@ -12,16 +12,14 @@ public class TCPServer : MonoBehaviour
     [Serializable]
     public class MssgClass
     {
-        public float Health;
+        //public float Health;
         public Vector3 PosicionFinal, PosicionDisparo, posFinalDisparo;
         public Quaternion rotacionFinal;
-        public bool LeDio;
         public MssgClass()
         {
             PosicionFinal = PosicionDisparo = posFinalDisparo = Vector3.zero;
             rotacionFinal = Quaternion.identity;
-            Health = 100;
-            LeDio = false;
+            //Health = 100;
         }
     }
     #region private members 	
@@ -40,7 +38,7 @@ public class TCPServer : MonoBehaviour
     private TcpClient connectedTcpClient;
     #endregion
 
-    MssgClass clasePrueba;
+    public MssgClass clasePrueba;
     // Use this for initialization
     void Start()
     {
@@ -94,8 +92,7 @@ public class TCPServer : MonoBehaviour
                             string clientMessage = Encoding.ASCII.GetString(incommingData);
                             Debug.Log("client message received as: " + clientMessage);
                             clasePrueba = JsonUtility.FromJson<MssgClass>(clientMessage);
-                            //Debug.Log("server message received as: " + clientMessage);
-                            Debug.Log("Nombre: " + clasePrueba.PosicionFinal);
+                            TurnManager.instancia.SimulatePlayer(clasePrueba.PosicionFinal, clasePrueba.PosicionDisparo, clasePrueba.rotacionFinal);
                         }
                     }
                 }
@@ -105,6 +102,11 @@ public class TCPServer : MonoBehaviour
         {
             Debug.Log("SocketException " + socketException.ToString());
         }
+    }
+
+    public void trySendingMsg()
+    {
+        SendMessage();
     }
     /// <summary> 	
     /// Send message to client using socket connection. 	
