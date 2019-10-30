@@ -9,6 +9,7 @@ public class Bullet : MonoBehaviour
     Vector3 currentDireccion = Vector3.zero;
     int bounces = 0;
     public int limitofBounces = 3;
+    public TankManager myShooter;
     void Awake()
     {
         Rb = GetComponent<Rigidbody>();
@@ -30,10 +31,13 @@ public class Bullet : MonoBehaviour
         Rb.AddForce(direccion * fuerza * 30.0f);
     }
 
-    /*private void OnTriggerEnter(Collider other)
+    public void Shoot(Vector3 direccion, TankManager tanky)
     {
-        
-    }*/
+        myShooter = tanky;
+        currentDireccion = direccion;
+        Rb.AddForce(direccion * fuerza * 30.0f);
+    }
+
 
     private void OnCollisionEnter(Collision collision)
     {
@@ -53,6 +57,9 @@ public class Bullet : MonoBehaviour
             {
                 collision.collider.GetComponent<TankManager>().TakeDMG(30);
             }
+            TurnManager.instancia.ChangeTurn();
+            Debug.Log(myShooter);
+            myShooter.SendTroughClient(transform.position);
             Destroy(gameObject);
         }
     }

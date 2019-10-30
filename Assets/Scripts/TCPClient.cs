@@ -14,13 +14,11 @@ public class TCPClient : MonoBehaviour
         public float Health;
         public Vector3 PosicionFinal, PosicionDisparo, posFinalDisparo;
         public Quaternion rotacionFinal;
-        public bool LeDio;
         public MssgClass()
         {
             PosicionFinal = PosicionDisparo = posFinalDisparo = Vector3.zero;
             rotacionFinal = Quaternion.identity;
             Health = 100;
-            LeDio = false;
         }
     }
 

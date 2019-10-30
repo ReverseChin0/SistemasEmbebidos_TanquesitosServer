@@ -22,7 +22,7 @@ public class TankManager : MonoBehaviour
     [Range(0.1f, 2f)]
     public float gastoFuel = 0.1f;
 
-    public bool IAPlayer = false;
+    public bool IAPlayer = false, didShoot=false;
     public int playerID = 0, Thealth = 100;
 
     void Start()
@@ -42,8 +42,11 @@ public class TankManager : MonoBehaviour
                 hasFuel = false;
                 activeTank = false;
                 Stop();
-                TurnManager.instancia.ChangeTurn();
-                SendTroughClient();
+                if (!didShoot)
+                {
+                    TurnManager.instancia.ChangeTurn();
+                    SendTroughClient();
+                }
             }
         }
     }
@@ -66,7 +69,7 @@ public class TankManager : MonoBehaviour
     void Shoot()
     {
         GameObject Go = Instantiate(Bullet, EndCannon.position, transform.rotation);
-        Go.GetComponent<Bullet>().Shoot(EndCannon.forward);
+        Go.GetComponent<Bullet>().Shoot(EndCannon.forward,this);
     }
 
     void Stop()
@@ -125,6 +128,7 @@ public class TankManager : MonoBehaviour
         hasFuel = true;
         Combustible = 10.0f;
         fuelImage.fillAmount = 1;
+        didShoot = true;
     }
 
     public void TakeDMG(int dmg)
@@ -144,12 +148,30 @@ public class TankManager : MonoBehaviour
         gameObject.SetActive(false);
     }
 
-    void SendTroughClient()
+    public void SendTroughClient()
     {
         TCPClient tcp = FindObjectOfType<TCPClient>();
+
         tcp.clasePrueba.Health = Thealth;
         tcp.clasePrueba.PosicionFinal = transform.position;
         tcp.clasePrueba.rotacionFinal = transform.rotation;
+
+        tcp.clasePrueba.PosicionDisparo = EndCannon.position;
+
+        tcp.trySendingMsg();
+    }
+
+    public void SendTroughClient(Vector3 DisparoFinal)
+    {
+        TCPClient tcp = FindObjectOfType<TCPClient>();
+
+        tcp.clasePrueba.Health = Thealth;
+        tcp.clasePrueba.PosicionFinal = transform.position;
+        tcp.clasePrueba.rotacionFinal = transform.rotation;
+
+        tcp.clasePrueba.PosicionDisparo = EndCannon.position;
+        tcp.clasePrueba.posFinalDisparo = DisparoFinal;
+
         tcp.trySendingMsg();
     }
 }
