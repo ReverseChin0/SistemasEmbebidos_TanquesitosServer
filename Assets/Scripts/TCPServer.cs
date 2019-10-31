@@ -75,7 +75,8 @@ public class TCPServer : MonoBehaviour
             tcpListener.Start();
             Debug.Log("Server is listening");
             Byte[] bytes = new Byte[1024];
-            while (true)
+            bool received = false; 
+            while (!received)
             {
                 using (connectedTcpClient = tcpListener.AcceptTcpClient())
                 {
@@ -92,11 +93,12 @@ public class TCPServer : MonoBehaviour
                             string clientMessage = Encoding.ASCII.GetString(incommingData);
                             Debug.Log("client message received as: " + clientMessage);
                             clasePrueba = JsonUtility.FromJson<MssgClass>(clientMessage);
-                            TurnManager.instancia.SimulatePlayer(clasePrueba.PosicionFinal, clasePrueba.PosicionDisparo, clasePrueba.rotacionFinal);
                         }
+                        //simulateIA();
                     }
                 }
             }
+            
         }
         catch (SocketException socketException)
         {
@@ -107,6 +109,11 @@ public class TCPServer : MonoBehaviour
     public void trySendingMsg()
     {
         SendMessage();
+    }
+
+    public void simulateIA()
+    {
+        TurnManager.instancia.SimulatePlayer(clasePrueba.PosicionFinal, clasePrueba.PosicionDisparo, clasePrueba.rotacionFinal);
     }
     /// <summary> 	
     /// Send message to client using socket connection. 	

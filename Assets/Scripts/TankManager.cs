@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
+using UnityEngine.AI;
 public class TankManager : MonoBehaviour
 {
     Collider miColi;
@@ -220,4 +221,5 @@ public class TankManager : MonoBehaviour
 
         tcp.trySendingMsg();
     }
+
 }
