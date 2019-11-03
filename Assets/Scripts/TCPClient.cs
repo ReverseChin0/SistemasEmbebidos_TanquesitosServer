@@ -8,21 +8,9 @@ using UnityEngine;
 
 public class TCPClient : MonoBehaviour
 {
-    [Serializable]
-    public class MssgClass
-    {
-        //public float Health;
-        public Vector3 PosicionFinal, PosicionDisparo, posFinalDisparo;
-        public Quaternion rotacionFinal;
-        public MssgClass()
-        {
-            PosicionFinal = PosicionDisparo = posFinalDisparo = Vector3.zero;
-            rotacionFinal = Quaternion.identity;
-            //Health = 100;
-        }
-    }
 
-    public MssgClass clasePrueba;
+    public TurnManager manager;
+    Queue<MsgClass> mensajesEnCola = new Queue<MsgClass>();
     #region private members 	
     private TcpClient socketConnection;
     private Thread clientReceiveThread;
@@ -30,16 +18,12 @@ public class TCPClient : MonoBehaviour
     // Use this for initialization 
     void Start()
     {
-        clasePrueba = new MssgClass();
         ConnectToTcpServer();
     }
     // Update is called once per frame
     void Update()
     {
-        if (Input.GetKeyDown(KeyCode.Space))
-        {
-            //SendMessage();
-        }
+        checkCola();
     }
     /// <summary> 	
     /// Setup socket connection. 	
@@ -81,9 +65,9 @@ public class TCPClient : MonoBehaviour
                         Array.Copy(bytes, 0, incommingData, 0, length);
                         // Convert byte array to string message. 						
                         string serverMessage = Encoding.ASCII.GetString(incommingData);
-                        clasePrueba = JsonUtility.FromJson<MssgClass>(serverMessage);
-                        Debug.Log("Nombre: " + clasePrueba);
-                        Debug.Log("Nombre: " + clasePrueba.posFinalDisparo);
+                        MsgClass clasePrueba = JsonUtility.FromJson<MsgClass>(serverMessage);
+                        mensajesEnCola.Enqueue(clasePrueba);
+                        Debug.Log("del server llego " + clasePrueba);
                     }
                 }
             }
@@ -94,14 +78,24 @@ public class TCPClient : MonoBehaviour
         }
     }
 
-    public void trySendingMsg()
+    public void checkCola()
     {
-        SendMessage();
+        while (mensajesEnCola.Count > 0)
+        {
+            Debug.Log(mensajesEnCola.Peek().PosicionFinal +" "+ mensajesEnCola.Peek().PosicionDisparo +" "+ mensajesEnCola.Peek().rotacionFinal);
+            manager.SimulatePlayer(mensajesEnCola.Peek().PosicionFinal, mensajesEnCola.Peek().PosicionDisparo, mensajesEnCola.Peek().rotacionFinal);
+            mensajesEnCola.Dequeue();
+        }
+    }
+
+    public void trySendingMsg(MsgClass msg)
+    {
+        SendMessage(msg);
     }
     /// <summary> 	
     /// Send message to server using socket connection. 	
     /// </summary> 	
-    private void SendMessage()
+    private void SendMessage(MsgClass claseprueba)
     {
         if (socketConnection == null)
         {
@@ -117,12 +111,12 @@ public class TCPClient : MonoBehaviour
                 /* Esta wea es la original
                 string clientMessage = "This is a message from one of your clients.";
                 */
-                string json = JsonUtility.ToJson(clasePrueba);
+                string json = JsonUtility.ToJson(claseprueba);
 
                 // Convert string message to byte array.                 
                 byte[] clientMessageAsByteArray = Encoding.ASCII.GetBytes(json);
                 // Write byte array to socketConnection stream.      
-                Debug.Log("Client tryed sending msg");
+                Debug.Log("Client tryed to send msg");
                 stream.Write(clientMessageAsByteArray, 0, clientMessageAsByteArray.Length);
             }
         }

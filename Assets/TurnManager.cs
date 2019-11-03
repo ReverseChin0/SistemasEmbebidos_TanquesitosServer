@@ -92,6 +92,7 @@ public class TurnManager : MonoBehaviour
     public IEnumerator WaitASec(float _t)
     {
         yield return new WaitForSeconds(_t);
+        Debug.Log("Cambiando... ");
         tankIndex++;
 
         if (tankIndex >= nTanks)
@@ -109,18 +110,11 @@ public class TurnManager : MonoBehaviour
             {
                 ln.enabled = true;
             }
-            else
-            {
-                monitorearIA = true;
-            }
-            
         }
-        else
+        /*else
         {
-
             StartCoroutine(WaitASec(0.0f));
-        }
-        
+        }*/
     }
 
     void MoveCamToPos()
@@ -141,11 +135,13 @@ public class TurnManager : MonoBehaviour
 
     void IAPlayerBehaviour()
     {
-        if ((IAEndPos-TankTransf[tankIndex].position).sqrMagnitude < 1.5f)
+        //Debug.Log((IAEndPos - TankTransf[tankIndex].position).sqrMagnitude);
+        if ((IAEndPos-TankTransf[tankIndex].position).sqrMagnitude < 2.5f)
         {
+            agente.isStopped = true;
             TankTransf[tankIndex].position = IAEndPos;
             TankTransf[tankIndex].rotation = IARot;
-            misTanques[tankIndex].Shoot();
+            StartCoroutine(waitToShoot());
             monitorearIA = false;
         }
     }
@@ -159,14 +155,25 @@ public class TurnManager : MonoBehaviour
         monitorearIA = true;
     }
 
-    
+   // [ContextMenu("simulate")]
     public void SimulatePlayer(Vector3 _dest, Vector3 _cannonPos, Quaternion _rotDestino)
     {
-       //Debug.Log("entre en simulatePlayer");
-        monitorearIA = true;
-        IAEndPos = _dest;
-        IAshootPos = _cannonPos;
-        IARot = _rotDestino;
-        agente.SetDestination(Vector3.zero);
+         monitorearIA = true;
+         IAEndPos = _dest;
+         IAshootPos = _cannonPos;
+         IARot = _rotDestino;
+        agente.isStopped = false;
+       /* monitorearIA = true;
+        IAEndPos = new Vector3(-30.0f, 1.7881393432617188e-7f, -30.0f);
+        IAshootPos = new Vector3(-29.696516036987306f, 1.700000286102295e-7f, -31.264080047607423f);
+        IARot = new Quaternion(2.1704217090245949e-8f, 0.9930682182312012f, -2.5688182692107377e-9f, 0.11753948032855988f);*/
+
+        agente.SetDestination(_dest);
+    }
+
+    IEnumerator waitToShoot()
+    {
+        yield return new WaitForSeconds(0.4f);
+        misTanques[tankIndex].Shoot();
     }
 }

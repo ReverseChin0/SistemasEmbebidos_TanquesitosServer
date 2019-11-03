@@ -57,9 +57,16 @@ public class Bullet : MonoBehaviour
             {
                 collision.collider.GetComponent<TankManager>().TakeDMG(30);
             }
-            TurnManager.instancia.ChangeTurn();
-            Debug.Log(myShooter);
-            myShooter.sendToConnection(transform.position);
+
+
+            if (!myShooter.IAPlayer)//si mi shooter no es la IA manda mensaje
+            {
+                myShooter.sendToConnection();
+            }
+            else//si es la IA solo cambia de turno
+            {
+                TurnManager.instancia.ChangeTurn();
+            }
             Destroy(gameObject);
         }
     }

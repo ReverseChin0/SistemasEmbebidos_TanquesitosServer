@@ -9,19 +9,9 @@ using UnityEngine;
 
 public class TCPServer : MonoBehaviour
 {
-    [Serializable]
-    public class MssgClass
-    {
-        //public float Health;
-        public Vector3 PosicionFinal, PosicionDisparo, posFinalDisparo;
-        public Quaternion rotacionFinal;
-        public MssgClass()
-        {
-            PosicionFinal = PosicionDisparo = posFinalDisparo = Vector3.zero;
-            rotacionFinal = Quaternion.identity;
-            //Health = 100;
-        }
-    }
+    public TurnManager manager;
+    Queue<MsgClass> mensajesEnCola = new Queue<MsgClass>();
+
     #region private members 	
     /// <summary> 	
     /// TCPListener to listen for incomming TCP connection 	
@@ -37,8 +27,6 @@ public class TCPServer : MonoBehaviour
     /// </summary> 	
     private TcpClient connectedTcpClient;
     #endregion
-
-    public MssgClass clasePrueba;
     // Use this for initialization
     void Start()
     {
@@ -49,16 +37,12 @@ public class TCPServer : MonoBehaviour
         tcpListenerThread = new Thread(new ThreadStart(ListenForIncommingRequests));
         tcpListenerThread.IsBackground = true;
         tcpListenerThread.Start();
-        clasePrueba = new MssgClass();
     }
 
     // Update is called once per frame
     void Update()
     {
-        if (Input.GetKeyDown(KeyCode.Space))
-        {
-            //SendMessage();
-        }
+        checkCola();
     }
 
     /// <summary> 	
@@ -75,8 +59,8 @@ public class TCPServer : MonoBehaviour
             tcpListener.Start();
             Debug.Log("Server is listening");
             Byte[] bytes = new Byte[1024];
-            bool received = false; 
-            while (!received)
+            //bool received = false; 
+            while (true)
             {
                 using (connectedTcpClient = tcpListener.AcceptTcpClient())
                 {
@@ -92,9 +76,9 @@ public class TCPServer : MonoBehaviour
                             // Convert byte array to string message. 							
                             string clientMessage = Encoding.ASCII.GetString(incommingData);
                             Debug.Log("client message received as: " + clientMessage);
-                            clasePrueba = JsonUtility.FromJson<MssgClass>(clientMessage);
+                            MsgClass clasePrueba = JsonUtility.FromJson<MsgClass>(clientMessage);
+                            mensajesEnCola.Enqueue(clasePrueba);
                         }
-                        //simulateIA();
                     }
                 }
             }
@@ -106,19 +90,25 @@ public class TCPServer : MonoBehaviour
         }
     }
 
-    public void trySendingMsg()
+  
+
+    public void checkCola()
     {
-        SendMessage();
+        while(mensajesEnCola.Count > 0)
+        {
+            manager.SimulatePlayer(mensajesEnCola.Peek().PosicionFinal, mensajesEnCola.Peek().PosicionDisparo, mensajesEnCola.Peek().rotacionFinal);
+            mensajesEnCola.Dequeue();
+        }
     }
 
-    public void simulateIA()
+    public void trySendingMsg(MsgClass msg)
     {
-        TurnManager.instancia.SimulatePlayer(clasePrueba.PosicionFinal, clasePrueba.PosicionDisparo, clasePrueba.rotacionFinal);
+        SendMessage(msg);
     }
     /// <summary> 	
     /// Send message to client using socket connection. 	
     /// </summary> 	
-    private void SendMessage()
+    private void SendMessage(MsgClass claseprueba)
     {
         if (connectedTcpClient == null)
         {
@@ -131,12 +121,12 @@ public class TCPServer : MonoBehaviour
             NetworkStream stream = connectedTcpClient.GetStream();
             if (stream.CanWrite)
             {
-                string serverMessage = "This is a message from your server.";
+                string json = JsonUtility.ToJson(claseprueba);
                 // Convert string message to byte array.                 
-                byte[] serverMessageAsByteArray = Encoding.ASCII.GetBytes(serverMessage);
+                byte[] serverMessageAsByteArray = Encoding.ASCII.GetBytes(json);
                 // Write byte array to socketConnection stream.               
                 stream.Write(serverMessageAsByteArray, 0, serverMessageAsByteArray.Length);
-                Debug.Log("Server sent his message - should be received by client");
+                //Debug.Log("Server sent his message - should be received by client");
             }
         }
 
