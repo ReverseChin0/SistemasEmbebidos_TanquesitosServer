@@ -61,7 +61,7 @@ public class Bullet : MonoBehaviour
 
             if (!myShooter.IAPlayer)//si mi shooter no es la IA manda mensaje
             {
-                myShooter.sendToConnection();
+                myShooter.sendToConnection(true);
             }
             else//si es la IA solo cambia de turno
             {

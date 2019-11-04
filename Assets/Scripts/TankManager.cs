@@ -45,7 +45,7 @@ public class TankManager : MonoBehaviour
                 Stop();
                 if (!didShoot)
                 {
-                    sendToConnection();
+                    sendToConnection(false);
                 }
             }
         }
@@ -151,30 +151,45 @@ public class TankManager : MonoBehaviour
     }
 
 
-    public void sendToConnection()
+    public void sendToConnection(bool _sh)
     {
         if (isServer)
         {
-            SendThroughServer();
+            SendThroughServer(_sh);
         }
         else
         {
-            SendTroughClient();
+            SendTroughClient(_sh);
         }
         TurnManager.instancia.ChangeTurn();
     }
 
 
 
-    public void SendThroughServer()
+    public void SendThroughServer(bool _s)
     {
-        FindObjectOfType<TCPServer>().trySendingMsg(new MsgClass(transform.position,EndCannon.position, transform.rotation));
+        if (_s)
+        {
+            FindObjectOfType<TCPServer>().trySendingMsg(new MsgClass(transform.position, EndCannon.position, transform.rotation));
+        }
+        else
+        {
+            FindObjectOfType<TCPServer>().trySendingMsg(new MsgClass(transform.position, EndCannon.position, transform.rotation,_s));
+        }
+        
     }
 
 
-    public void SendTroughClient()
+    public void SendTroughClient(bool _s)
     {
-        FindObjectOfType<TCPClient>().trySendingMsg(new MsgClass(transform.position, EndCannon.position, transform.rotation));
+        if (_s)
+        {
+            FindObjectOfType<TCPClient>().trySendingMsg(new MsgClass(transform.position, EndCannon.position, transform.rotation));
+        }
+        else
+        {
+            FindObjectOfType<TCPClient>().trySendingMsg(new MsgClass(transform.position, EndCannon.position, transform.rotation,_s));
+        }
     }
 
 

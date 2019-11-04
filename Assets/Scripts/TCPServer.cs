@@ -96,7 +96,7 @@ public class TCPServer : MonoBehaviour
     {
         while(mensajesEnCola.Count > 0)
         {
-            manager.SimulatePlayer(mensajesEnCola.Peek().PosicionFinal, mensajesEnCola.Peek().PosicionDisparo, mensajesEnCola.Peek().rotacionFinal);
+            manager.SimulatePlayer(mensajesEnCola.Peek().PosicionFinal, mensajesEnCola.Peek().PosicionDisparo, mensajesEnCola.Peek().rotacionFinal, mensajesEnCola.Peek().didshoot);
             mensajesEnCola.Dequeue();
         }
     }
