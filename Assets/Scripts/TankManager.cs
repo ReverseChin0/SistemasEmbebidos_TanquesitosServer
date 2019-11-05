@@ -18,7 +18,8 @@ public class TankManager : MonoBehaviour
 
     public Image fuelImage;
     float Combustible = 10.0f;
-    bool hasFuel = true, activeTank = false;
+    bool hasFuel = true;
+    public bool activeTank = false;
 
     [Range(0.1f, 2f)]
     public float gastoFuel = 0.1f;

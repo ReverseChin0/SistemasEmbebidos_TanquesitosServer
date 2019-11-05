@@ -94,6 +94,7 @@ public class TurnManager : MonoBehaviour
     {
         yield return new WaitForSeconds(_t);
         Debug.Log("Cambiando... ");
+        misTanques[tankIndex].activeTank = false;
         tankIndex++;
 
         if (tankIndex >= nTanks)
@@ -160,6 +161,7 @@ public class TurnManager : MonoBehaviour
         IAshootPos = _cannonPos;
         IARot = _rotDestino;
         IAdidshoot = didshoot;
+        agente.isStopped = false;
         agente.SetDestination(_dest);
         monitorearIA = true;
     }
