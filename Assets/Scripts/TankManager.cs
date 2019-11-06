@@ -137,6 +137,7 @@ public class TankManager : MonoBehaviour
     public void TakeDMG(int dmg)
     {
         Thealth = Thealth - dmg;
+        RigBo.velocity = Vector3.zero;
         Debug.Log("Im " + playerID + "and my health is" + Thealth);
         if (Thealth <= 0)
         {
@@ -146,7 +147,7 @@ public class TankManager : MonoBehaviour
 
     void Die()
     {
-        TurnManager.instancia.ChangeTurn();
+        TurnManager.instancia.CheckWinner();
         //TurnManager.instancia.alivePlayers--;
         gameObject.SetActive(false);
     }

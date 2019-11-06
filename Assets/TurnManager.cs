@@ -2,6 +2,8 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.AI;
+using UnityEngine.UI;
+using TMPro;
 public class TurnManager : MonoBehaviour
 {
     public static TurnManager instancia;
@@ -9,6 +11,10 @@ public class TurnManager : MonoBehaviour
     List<Transform> TankTransf = new List<Transform>();
     public Vector3 offset;
     NavMeshAgent agente;
+    public Image turno,winner;
+    public GameObject winnerScr;
+    public TextMeshProUGUI feedbackText;
+    public Color[] colores;
 
     int nTanks, tankIndex=0,alivePlayers;
 
@@ -45,6 +51,8 @@ public class TurnManager : MonoBehaviour
         ln.positionCount = 3;
 
         agente = FindObjectOfType<NavMeshAgent>();
+        turno.color = colores[tankIndex];
+        feedbackText.text = "Turno Jugador";
     }
 
     private void Update()
@@ -101,6 +109,7 @@ public class TurnManager : MonoBehaviour
         {
             tankIndex = 0;
         }
+        turno.color = colores[tankIndex];
 
         ValorT = 0;
         if (misTanques[tankIndex].Thealth > 0)
@@ -164,6 +173,7 @@ public class TurnManager : MonoBehaviour
         agente.isStopped = false;
         agente.SetDestination(_dest);
         monitorearIA = true;
+        agente.gameObject.GetComponent<Rigidbody>().velocity = Vector3.zero;
     }
 
    // [ContextMenu("simulate")]
@@ -185,5 +195,22 @@ public class TurnManager : MonoBehaviour
     {
         yield return new WaitForSeconds(0.4f);
         misTanques[tankIndex].Shoot();
+    }
+
+    public void CheckWinner()
+    {
+        Debug.Log("the winner is...");
+        if (misTanques[0].Thealth > 0)
+        {
+            winnerScr.SetActive(true);
+            Debug.Log("GREEEEEEEEEEN");
+            winner.color = colores[0];
+        }
+        else
+        {
+            winnerScr.SetActive(true);
+            Debug.Log("PURPLEEEEEEEE");
+            winner.color = colores[1];
+        }
     }
 }

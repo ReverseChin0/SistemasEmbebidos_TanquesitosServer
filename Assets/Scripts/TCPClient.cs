@@ -11,6 +11,8 @@ public class TCPClient : MonoBehaviour
 
     public TurnManager manager;
     Queue<MsgClass> mensajesEnCola = new Queue<MsgClass>();
+    string IP;
+    int Puerto;
     #region private members 	
     private TcpClient socketConnection;
     private Thread clientReceiveThread;
@@ -18,6 +20,13 @@ public class TCPClient : MonoBehaviour
     // Use this for initialization 
     void Start()
     {
+       
+    }
+
+    public void InitializeConnection(string _IP, int _port)
+    {
+        IP = _IP;
+        Puerto = _port;
         ConnectToTcpServer();
     }
     // Update is called once per frame
@@ -49,7 +58,7 @@ public class TCPClient : MonoBehaviour
         try
         {
             //socketConnection = new TcpClient("192.168.1.85", 8000);//jojo te voy a 
-            socketConnection = new TcpClient("127.0.0.1", 82);
+            socketConnection = new TcpClient(IP, Puerto);
 
             Byte[] bytes = new Byte[1024];
             while (true)

@@ -11,7 +11,8 @@ public class TCPServer : MonoBehaviour
 {
     public TurnManager manager;
     Queue<MsgClass> mensajesEnCola = new Queue<MsgClass>();
-
+    string IP;
+    int Puerto;
     #region private members 	
     /// <summary> 	
     /// TCPListener to listen for incomming TCP connection 	
@@ -30,10 +31,16 @@ public class TCPServer : MonoBehaviour
     // Use this for initialization
     void Start()
     {
-        string ipv4 = IPManager.GetIP(ADDRESSFAM.IPv4);
-        Debug.Log(ipv4);
+       
 
         // Start TcpServer background thread 		
+        
+    }
+
+    public void InitializeConnection(string _IP, int _port)
+    {
+        IP = _IP;
+        Puerto = _port;
         tcpListenerThread = new Thread(new ThreadStart(ListenForIncommingRequests));
         tcpListenerThread.IsBackground = true;
         tcpListenerThread.Start();
@@ -54,7 +61,7 @@ public class TCPServer : MonoBehaviour
         {
             // Create listener on localhost port 8052. 			
             //tcpListener = new TcpListener(IPAddress.Parse("192.168.1.82"), 82); // este es el bueno de las pruebas con el router del profe
-            tcpListener = new TcpListener(IPAddress.Parse("127.0.0.1"), 82);
+            tcpListener = new TcpListener(IPAddress.Parse(IP), Puerto);
 
             tcpListener.Start();
             Debug.Log("Server is listening");
@@ -90,7 +97,6 @@ public class TCPServer : MonoBehaviour
         }
     }
 
-  
 
     public void checkCola()
     {
