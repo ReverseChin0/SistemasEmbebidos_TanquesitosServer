@@ -102,7 +102,6 @@ public class TurnManager : MonoBehaviour
     {
         yield return new WaitForSeconds(_t);
         Debug.Log("Cambiando... ");
-        misTanques[tankIndex].activeTank = false;
         tankIndex++;
 
         if (tankIndex >= nTanks)

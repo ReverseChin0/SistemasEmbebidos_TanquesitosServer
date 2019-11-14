@@ -19,7 +19,6 @@ public class TankManager : MonoBehaviour
     public Image fuelImage;
     float Combustible = 10.0f;
     bool hasFuel = true;
-    public bool activeTank = false;
 
     [Range(0.1f, 2f)]
     public float gastoFuel = 0.1f;
@@ -36,18 +35,13 @@ public class TankManager : MonoBehaviour
 
     void Update()
     {
-        if (!IAPlayer && hasFuel && activeTank)
+        if (!IAPlayer && hasFuel)
         {
             TankMovimiento();
             if (Combustible <= 0)
             {
                 hasFuel = false;
-                activeTank = false;
                 Stop();
-                if (!didShoot)
-                {
-                    sendToConnection(false);
-                }
             }
         }
     }
@@ -69,9 +63,7 @@ public class TankManager : MonoBehaviour
 
     public void Shoot()
     {
-        TurnManager.instancia.turnOffLine(true);
-        //Combustible = 0;
-        hasFuel = false;
+        //TurnManager.instancia.turnOffLine(true);
         GameObject Go = Instantiate(Bullet, EndCannon.position, transform.rotation);
         Go.GetComponent<Bullet>().Shoot(EndCannon.forward,this);
         Stop();
@@ -127,7 +119,6 @@ public class TankManager : MonoBehaviour
 
     public void ActivateTank()
     {
-        activeTank = true;
         hasFuel = true;
         Combustible = 10.0f;
         fuelImage.fillAmount = 1;
@@ -138,7 +129,7 @@ public class TankManager : MonoBehaviour
     {
         Thealth = Thealth - dmg;
         RigBo.velocity = Vector3.zero;
-        Debug.Log("Im " + playerID + "and my health is" + Thealth);
+        Debug.Log("Soy " + playerID + " y mi salud es " + Thealth);
         if (Thealth <= 0)
         {
             Die();
@@ -148,10 +139,9 @@ public class TankManager : MonoBehaviour
     void Die()
     {
         TurnManager.instancia.CheckWinner();
-        //TurnManager.instancia.alivePlayers--;
         gameObject.SetActive(false);
     }
-
+    /*
 
     public void sendToConnection(bool _sh)
     {
@@ -163,7 +153,6 @@ public class TankManager : MonoBehaviour
         {
             SendTroughClient(_sh);
         }
-        TurnManager.instancia.ChangeTurn();
     }
 
 
@@ -193,6 +182,6 @@ public class TankManager : MonoBehaviour
             FindObjectOfType<TCPClient>().trySendingMsg(new MsgClass(transform.position, EndCannon.position, transform.rotation,_s));
         }
     }
-
+    */
 
 }
