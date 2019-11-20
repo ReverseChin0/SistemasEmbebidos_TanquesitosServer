@@ -9,7 +9,7 @@ using UnityEngine;
 public class TCPClient : MonoBehaviour
 {
 
-    public TurnManager manager;
+    public GameTankManager manager;
     Queue<MsgClass> mensajesEnCola = new Queue<MsgClass>();
     string IP;
     int Puerto;

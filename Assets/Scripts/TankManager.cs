@@ -41,8 +41,18 @@ public class TankManager : MonoBehaviour
             if (Combustible <= 0)
             {
                 hasFuel = false;
+                fuelImage.color = new Color(1.0f, 0.3f, 0.5f);
                 Stop();
             }
+            else
+            {
+                RegenerateFuel();
+            }
+        }
+        else if(!hasFuel)
+        {
+            RegenerateFuel();
+            CheckIfFull();
         }
     }
 
@@ -87,13 +97,13 @@ public class TankManager : MonoBehaviour
         if (Input.GetKey(KeyCode.W))
         {
             Forward();
-            Combustible -= gastoFuel * Time.deltaTime;
+            Combustible -= gastoFuel * 1.5f * Time.deltaTime;
         }
 
         if (Input.GetKey(KeyCode.S))
         {
             Back();
-            Combustible -= gastoFuel * Time.deltaTime;
+            Combustible -= gastoFuel * 1.5f * Time.deltaTime;
         }
 
         if (Input.GetKey(KeyCode.D))
@@ -110,11 +120,42 @@ public class TankManager : MonoBehaviour
 
         if (Input.GetKeyDown(KeyCode.Space))
         {
-            Shoot();
+            if (Combustible >= 3.5f)
+            {
+                Shoot();
+                Combustible -= 5.5f;
+                if (Combustible < 0)
+                {
+                    Combustible = -0.1f;
+                }
+            }
         }
 
         Rotate();
         fuelImage.fillAmount = Combustible * 0.1f;
+    }
+
+    public void RegenerateFuel() 
+    {
+        if (Combustible < 10.0f)
+        {
+            Combustible += gastoFuel * 0.5f * Time.deltaTime;
+        }
+
+        if (!hasFuel)
+        {
+            Combustible += gastoFuel * Time.deltaTime;
+        }
+    }
+
+    public void CheckIfFull()
+    {
+        fuelImage.fillAmount = Combustible * 0.1f;
+        if (Combustible >= 10.0f)
+        {
+            hasFuel = true;
+            fuelImage.color = new Color(0.4154f, 1.0f, 0.3537736f);
+        }
     }
 
     public void ActivateTank()
@@ -138,7 +179,7 @@ public class TankManager : MonoBehaviour
 
     void Die()
     {
-        TurnManager.instancia.CheckWinner();
+        GameTankManager.instancia.CheckWinner(IAPlayer);
         gameObject.SetActive(false);
     }
     /*

@@ -7,9 +7,9 @@ using System.Text;
 using System.Threading;
 using UnityEngine;
 
-public class TCPServer : MonoBehaviour
+public class TCPServer : MonoBehaviour 
 {
-    public TurnManager manager;
+    public GameTankManager manager;
     Queue<MsgClass> mensajesEnCola = new Queue<MsgClass>();
     string IP;
     int Puerto;

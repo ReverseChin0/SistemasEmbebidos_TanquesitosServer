@@ -161,20 +161,16 @@ public class GameTankManager : MonoBehaviour
         miTanque.Shoot();
     }
 
-    public void CheckWinner()
+    public void CheckWinner(bool IADied)
     {
-        Debug.Log("the winner is...");
-        if (miTanque.Thealth > 0)
+        if (IADied)
         {
-            winnerScr.SetActive(true);
-            Debug.Log("GREEEEEEEEEEN");
-            winner.color = colores[0];
+            Debug.Log("Ganastes");
         }
         else
         {
-            winnerScr.SetActive(true);
-            Debug.Log("PURPLEEEEEEEE");
-            winner.color = colores[1];
+            Debug.Log("Perdistes");
         }
+       
     }
 }
