@@ -83,8 +83,6 @@ public class GameTankManager : MonoBehaviour
         yield return new WaitForSeconds(_t);
         Debug.Log("Cambiando... ");
 
-        
-
         ValorT = 0;
         if (miTanque.Thealth > 0)
         {
@@ -95,7 +93,6 @@ public class GameTankManager : MonoBehaviour
                 ln.enabled = true;
             }
         }
-       
     }
 
     void MoveCamToPos()
