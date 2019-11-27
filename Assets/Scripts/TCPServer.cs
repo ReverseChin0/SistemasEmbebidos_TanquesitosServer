@@ -10,6 +10,9 @@ using UnityEngine;
 public class TCPServer : MonoBehaviour 
 {
     public GameTankManager manager;
+    public TankManager EnemieTank;
+    Transform TankTrans;
+
     Queue<MsgClass> mensajesEnCola = new Queue<MsgClass>();
     string IP;
     int Puerto;
@@ -31,8 +34,7 @@ public class TCPServer : MonoBehaviour
     // Use this for initialization
     void Start()
     {
-       
-
+        TankTrans = EnemieTank.transform;
         // Start TcpServer background thread 		
         
     }
@@ -111,6 +113,8 @@ public class TCPServer : MonoBehaviour
     {
         SendMessage(msg);
     }
+
+   
     /// <summary> 	
     /// Send message to client using socket connection. 	
     /// </summary> 	
@@ -140,5 +144,10 @@ public class TCPServer : MonoBehaviour
         {
             Debug.Log("Socket exception: " + socketException);
         }
+    }
+
+    public void EndThreadsComunications()
+    {
+        tcpListenerThread.Abort();
     }
 }
