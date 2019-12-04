@@ -1198,8 +1198,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 08788f4508f209340bae18710516a502, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  manager: {fileID: 1849199471}
-  EnemieTank: {fileID: 919839949}
+  tank: {fileID: 919839949}
 --- !u!4 &685225174
 Transform:
   m_ObjectHideFlags: 0
@@ -1464,7 +1463,7 @@ NavMeshAgent:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 919839945}
-  m_Enabled: 1
+  m_Enabled: 0
   m_AgentTypeID: 0
   m_Radius: 0.5
   m_Speed: 3.5
@@ -2905,7 +2904,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1828017324}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 3df27b9289d1e8c4fb82e0df4f4673ba, type: 3}
   m_Name: 
@@ -3271,6 +3270,11 @@ PrefabInstance:
         type: 3}
       propertyPath: IAPlayer
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 195734071114916437, guid: 42ec1febccf9a9341af9bf19970326d5,
+        type: 3}
+      propertyPath: isServer
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 195734071114528856, guid: 42ec1febccf9a9341af9bf19970326d5,
         type: 3}
@@ -3893,6 +3897,11 @@ PrefabInstance:
     - target: {fileID: 195734071114916437, guid: 42ec1febccf9a9341af9bf19970326d5,
         type: 3}
       propertyPath: IAPlayer
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 195734071114916437, guid: 42ec1febccf9a9341af9bf19970326d5,
+        type: 3}
+      propertyPath: isServer
       value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 195734071114528856, guid: 42ec1febccf9a9341af9bf19970326d5,

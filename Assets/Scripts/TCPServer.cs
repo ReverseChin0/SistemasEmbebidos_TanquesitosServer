@@ -9,11 +9,10 @@ using UnityEngine;
 
 public class TCPServer : MonoBehaviour 
 {
-    public GameTankManager manager;
-    public TankManager EnemieTank;
-    Transform TankTrans;
 
-    Queue<MsgClass> mensajesEnCola = new Queue<MsgClass>();
+
+    //Queue<MsgClass> mensajesEnCola = new Queue<MsgClass>();
+    MsgClass mensajeMasNuevo = null;
     string IP;
     int Puerto;
     #region private members 	
@@ -25,18 +24,32 @@ public class TCPServer : MonoBehaviour
     /// <summary> 
     /// Background thread for TcpServer workload. 	
     /// </summary> 	
-    private Thread tcpListenerThread;
+    private Thread tcpListenerThread, cambiadorDePosiciones;
+
+   
+
     /// <summary> 	
     /// Create handle to connected tcp client. 	
     /// </summary> 	
     private TcpClient connectedTcpClient;
     #endregion
     // Use this for initialization
+
+    //============================DataIA====================================
+    public TankManager tank;
+    Transform MyTank, EndCannon;
+    Vector3 IAPos, IAShootPos;
+    Quaternion IARot;
+    bool IAdidshoot;
+    //============================DataIA====================================
     void Start()
     {
-        TankTrans = EnemieTank.transform;
-        // Start TcpServer background thread 		
-        
+        MyTank = tank.transform;
+        EndCannon = tank.EndCannon.transform;
+        IAPos = MyTank.position;
+        IAShootPos = tank.EndCannon.position;
+        IARot = MyTank.rotation;
+        IAdidshoot = false;
     }
 
     public void InitializeConnection(string _IP, int _port)
@@ -46,12 +59,17 @@ public class TCPServer : MonoBehaviour
         tcpListenerThread = new Thread(new ThreadStart(ListenForIncommingRequests));
         tcpListenerThread.IsBackground = true;
         tcpListenerThread.Start();
+
+        cambiadorDePosiciones = new Thread(ProcessData2ndPlayer);
+        cambiadorDePosiciones.Start();
     }
 
     // Update is called once per frame
     void Update()
     {
-        checkCola();
+        MyTank.position = IAPos;
+        EndCannon.position = IAShootPos;
+        MyTank.rotation = IARot;
     }
 
     /// <summary> 	
@@ -86,7 +104,8 @@ public class TCPServer : MonoBehaviour
                             string clientMessage = Encoding.ASCII.GetString(incommingData);
                             Debug.Log("client message received as: " + clientMessage);
                             MsgClass clasePrueba = JsonUtility.FromJson<MsgClass>(clientMessage);
-                            mensajesEnCola.Enqueue(clasePrueba);
+                            //mensajesEnCola.Enqueue(clasePrueba);
+                            mensajeMasNuevo = clasePrueba;
                         }
                     }
                 }
@@ -99,14 +118,28 @@ public class TCPServer : MonoBehaviour
         }
     }
 
-
-    public void checkCola()
+    private void ProcessData2ndPlayer()
     {
-        while(mensajesEnCola.Count > 0)
+        while (true)
+        {
+            checkAndChange(ref IAPos, ref IAShootPos, ref IARot, ref IAdidshoot);
+        }
+    }
+
+    public void checkAndChange(ref Vector3 _IAPos, ref Vector3 _IAShPos, ref Quaternion _IARot, ref bool _IAdidshoot)
+    {
+        if (mensajeMasNuevo != null)
+        {
+            IAPos = _IAPos;
+            IAShootPos = _IAShPos;
+            IARot = _IARot;
+            IAdidshoot = _IAdidshoot;
+        }
+        /*while(mensajesEnCola.Count > 0)
         {
             manager.SimulatePlayer(mensajesEnCola.Peek().PosicionFinal, mensajesEnCola.Peek().PosicionDisparo, mensajesEnCola.Peek().rotacionFinal, mensajesEnCola.Peek().didshoot);
             mensajesEnCola.Dequeue();
-        }
+        }*/
     }
 
     public void trySendingMsg(MsgClass msg)
@@ -149,5 +182,7 @@ public class TCPServer : MonoBehaviour
     public void EndThreadsComunications()
     {
         tcpListenerThread.Abort();
+        cambiadorDePosiciones.Abort();
     }
+
 }

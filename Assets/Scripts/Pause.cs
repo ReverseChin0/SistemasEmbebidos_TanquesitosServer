@@ -13,7 +13,6 @@ public class Pause : MonoBehaviour
         Cursor.visible = !pauseMenuM.activeSelf;
         Cursor.lockState = CursorLockMode.None;
         pauseMenuM.SetActive(!pauseMenuM.activeSelf);
-
     }
 
 
@@ -27,6 +26,14 @@ public class Pause : MonoBehaviour
 
     public void backToMain()
     {
-        SceneManager.LoadScene("Menu");
+        if (FindObjectOfType<TCPClient>() != null)
+        {
+            FindObjectOfType<TCPClient>().EndThreadsComunications();
+        }
+        else
+        {
+            FindObjectOfType<TCPServer>().EndThreadsComunications();
+        }
+        SceneManager.LoadScene("Menu"); 
     }
 }

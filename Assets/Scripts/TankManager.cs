@@ -16,6 +16,9 @@ public class TankManager : MonoBehaviour
 
     public GameObject Bullet;
 
+    public TCPClient myClient;
+    public TCPServer myServer;
+
     public Image fuelImage;
     float Combustible = 10.0f;
     bool hasFuel = true;
@@ -31,6 +34,15 @@ public class TankManager : MonoBehaviour
         miColi = GetComponent<Collider>();
         RigBo = GetComponent<Rigidbody>();
         Stop();
+
+        if (isServer)
+        {
+            myServer = FindObjectOfType<TCPServer>();
+        }
+        else
+        {
+            myClient = FindObjectOfType<TCPClient>();
+        }
     }
 
     void Update()
@@ -38,6 +50,7 @@ public class TankManager : MonoBehaviour
         if (!IAPlayer && hasFuel)
         {
             TankMovimiento();
+            SendMssgToBoss(new MsgClass(transform.position,EndCannon.position,transform.rotation,didShoot));
             if (Combustible <= 0)
             {
                 hasFuel = false;
@@ -48,6 +61,7 @@ public class TankManager : MonoBehaviour
             {
                 RegenerateFuel();
             }
+            didShoot = false;
         }
         else if(!hasFuel)
         {
@@ -77,6 +91,7 @@ public class TankManager : MonoBehaviour
         GameObject Go = Instantiate(Bullet, EndCannon.position, transform.rotation);
         Go.GetComponent<Bullet>().Shoot(EndCannon.forward,this);
         Stop();
+        didShoot = true;
     }
 
     void Stop()
@@ -182,47 +197,16 @@ public class TankManager : MonoBehaviour
         GameTankManager.instancia.CheckWinner(IAPlayer);
         gameObject.SetActive(false);
     }
-    /*
-
-    public void sendToConnection(bool _sh)
+    
+    void SendMssgToBoss(MsgClass _msg)
     {
         if (isServer)
         {
-            SendThroughServer(_sh);
+            myServer.trySendingMsg(_msg);
         }
         else
         {
-            SendTroughClient(_sh);
+            myClient.trySendingMsg(_msg);
         }
     }
-
-
-
-    public void SendThroughServer(bool _s)
-    {
-        if (_s)
-        {
-            FindObjectOfType<TCPServer>().trySendingMsg(new MsgClass(transform.position, EndCannon.position, transform.rotation));
-        }
-        else
-        {
-            FindObjectOfType<TCPServer>().trySendingMsg(new MsgClass(transform.position, EndCannon.position, transform.rotation,_s));
-        }
-        
-    }
-
-
-    public void SendTroughClient(bool _s)
-    {
-        if (_s)
-        {
-            FindObjectOfType<TCPClient>().trySendingMsg(new MsgClass(transform.position, EndCannon.position, transform.rotation));
-        }
-        else
-        {
-            FindObjectOfType<TCPClient>().trySendingMsg(new MsgClass(transform.position, EndCannon.position, transform.rotation,_s));
-        }
-    }
-    */
-
 }

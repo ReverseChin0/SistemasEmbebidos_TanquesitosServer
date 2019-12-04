@@ -9,18 +9,32 @@ using UnityEngine;
 public class TCPClient : MonoBehaviour
 {
 
-    public GameTankManager manager;
-    Queue<MsgClass> mensajesEnCola = new Queue<MsgClass>();
+   
+    //Queue<MsgClass> mensajesEnCola = new Queue<MsgClass>();
+    MsgClass mensajeMasNuevo = null;
     string IP;
     int Puerto;
     #region private members 	
     private TcpClient socketConnection;
-    private Thread clientReceiveThread;
+    private Thread clientReceiveThread, cambiadorDePosiciones;
     #endregion
-    // Use this for initialization 
+
+    //============================DataIA====================================
+    public TankManager tank;
+    Transform MyTank, EndCannon;
+    Vector3 IAPos, IAShootPos;
+    Quaternion IARot;
+    bool IAdidshoot;
+    //============================DataIA====================================
+
     void Start()
     {
-       
+        MyTank = tank.transform;
+        EndCannon = tank.EndCannon.transform;
+        IAPos = MyTank.position;
+        IAShootPos = tank.EndCannon.position;
+        IARot = MyTank.rotation;
+        IAdidshoot = false;
     }
 
     public void InitializeConnection(string _IP, int _port)
@@ -32,7 +46,9 @@ public class TCPClient : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        checkCola();
+        MyTank.position = IAPos;
+        EndCannon.position = IAShootPos;
+        MyTank.rotation = IARot;
     }
     /// <summary> 	
     /// Setup socket connection. 	
@@ -44,6 +60,9 @@ public class TCPClient : MonoBehaviour
             clientReceiveThread = new Thread(new ThreadStart(ListenForData));
             clientReceiveThread.IsBackground = true;
             clientReceiveThread.Start();
+
+            cambiadorDePosiciones = new Thread(ProcessData2ndPlayer);
+            cambiadorDePosiciones.Start();
         }
         catch (Exception e)
         {
@@ -75,7 +94,8 @@ public class TCPClient : MonoBehaviour
                         // Convert byte array to string message. 						
                         string serverMessage = Encoding.ASCII.GetString(incommingData);
                         MsgClass clasePrueba = JsonUtility.FromJson<MsgClass>(serverMessage);
-                        mensajesEnCola.Enqueue(clasePrueba);
+                        mensajeMasNuevo = clasePrueba;
+                        //mensajesEnCola.Enqueue(clasePrueba);
                         Debug.Log("del server llego " + clasePrueba);
                     }
                 }
@@ -87,15 +107,32 @@ public class TCPClient : MonoBehaviour
         }
     }
 
-    public void checkCola()
+    private void ProcessData2ndPlayer() 
     {
-        while (mensajesEnCola.Count > 0)
+        while (true)
+        {
+            checkAndChange(ref IAPos, ref IAShootPos, ref IARot, ref IAdidshoot);
+        }
+    }
+
+    public void checkAndChange(ref Vector3 _IAPos,ref Vector3 _IAShPos,ref Quaternion _IARot,ref bool _IAdidshoot)
+    {
+        if (mensajeMasNuevo != null) 
+        {
+            IAPos = _IAPos;
+            IAShootPos = _IAShPos;
+            IARot = _IARot;
+            IAdidshoot = _IAdidshoot;
+        }
+        /*while (mensajesEnCola.Count > 0)
         {
             //Debug.Log(mensajesEnCola.Peek().PosicionFinal +" "+ mensajesEnCola.Peek().PosicionDisparo +" "+ mensajesEnCola.Peek().rotacionFinal);
             manager.SimulatePlayer(mensajesEnCola.Peek().PosicionFinal, mensajesEnCola.Peek().PosicionDisparo, mensajesEnCola.Peek().rotacionFinal, mensajesEnCola.Peek().didshoot);
             mensajesEnCola.Dequeue();
-        }
+        }*/
     }
+
+
 
     public void trySendingMsg(MsgClass msg)
     {
@@ -103,7 +140,8 @@ public class TCPClient : MonoBehaviour
     }
     /// <summary> 	
     /// Send message to server using socket connection. 	
-    /// </summary> 	
+    /// </summary> 
+    /// 
     private void SendMessage(MsgClass claseprueba)
     {
         if (socketConnection == null)
@@ -116,7 +154,6 @@ public class TCPClient : MonoBehaviour
             NetworkStream stream = socketConnection.GetStream();
             if (stream.CanWrite)
             {
-
                 /* Esta wea es la original
                 string clientMessage = "This is a message from one of your clients.";
                 */
@@ -133,5 +170,11 @@ public class TCPClient : MonoBehaviour
         {
             Debug.Log("Socket exception: " + socketException);
         }
+    }
+
+    public void EndThreadsComunications() 
+    {
+        clientReceiveThread.Abort();
+        cambiadorDePosiciones.Abort();
     }
 }

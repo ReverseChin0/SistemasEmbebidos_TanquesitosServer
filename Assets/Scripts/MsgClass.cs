@@ -15,7 +15,6 @@ public class MsgClass
         PosicionDisparo = _posDisp;
         rotacionFinal = _rotfinal;
         didshoot = _didshoot;
-
     }
 
     public MsgClass(Vector3 _pos, Vector3 _posDisp, Quaternion _rotfinal)
@@ -23,6 +22,15 @@ public class MsgClass
         PosicionFinal = _pos;
         PosicionDisparo = _posDisp;
         rotacionFinal = _rotfinal;
-        didshoot = true;
+        didshoot = false;
+    }
+
+    public MsgClass()
+    {
+
+        PosicionFinal = Vector3.zero;
+        PosicionDisparo = Vector3.zero;
+        rotacionFinal = Quaternion.identity;
+        didshoot = false;
     }
 }

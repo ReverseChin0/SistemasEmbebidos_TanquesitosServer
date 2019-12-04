@@ -27,8 +27,12 @@ public class TcpUiManager : MonoBehaviour
     
     public void getValuesAndGo()
     {
-        IPelegida = Inputtexto.text;
-        Puertos = Puerto.text;
+        if(Inputtexto.text != "" && Puerto.text!= "") 
+        {
+            IPelegida = Inputtexto.text;
+            Puertos = Puerto.text;
+        }
+        
         StartCoroutine(iniciarComunicacion());
         if (server)
         {
