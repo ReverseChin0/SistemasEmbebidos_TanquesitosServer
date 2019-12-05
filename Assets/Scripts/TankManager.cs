@@ -29,7 +29,7 @@ public class TankManager : MonoBehaviour
     public bool IAPlayer = false, isServer = false;
     public int playerID = 0, Thealth = 100;
 
-    float Timer = 0.0f, interval=0.06f, newtime=1.0f;
+    float Timer = 0.0f, interval=0.08f, newtime=1.0f;
 
     void Start()
     {

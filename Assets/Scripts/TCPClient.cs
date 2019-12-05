@@ -14,6 +14,7 @@ public class TCPClient : MonoBehaviour
     MsgClass mensajeMasNuevo = null;
     string IP;
     int Puerto;
+    bool abierto = true;
     #region private members 	
     private TcpClient socketConnection;
     private Thread clientReceiveThread, cambiadorDePosiciones;
@@ -94,7 +95,7 @@ public class TCPClient : MonoBehaviour
             socketConnection = new TcpClient(IP, Puerto);
 
             Byte[] bytes = new Byte[1024];
-            while (true)
+            while (abierto)
             {
                 // Get a stream object for reading 				
                 using (NetworkStream stream = socketConnection.GetStream())
@@ -129,7 +130,7 @@ public class TCPClient : MonoBehaviour
 
     private void ProcessData2ndPlayer() 
     {
-        while (true)
+        while (abierto)
         {
             checkAndChange(ref IAPos, ref IAShootPos, ref IARot, ref IAdidshoot, ref IAlive);
         }
@@ -199,6 +200,7 @@ public class TCPClient : MonoBehaviour
     public void EndThreadsComunications() 
     {
         Debug.Log("CerrandoCliente");
+        abierto = false;
         clientReceiveThread.Abort();
         cambiadorDePosiciones.Abort();
     }

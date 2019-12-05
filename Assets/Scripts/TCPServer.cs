@@ -15,6 +15,7 @@ public class TCPServer : MonoBehaviour
     MsgClass mensajeMasNuevo = null;
     string IP;
     int Puerto;
+    bool abierto = true;
     #region private members 	
     /// <summary> 	
     /// TCPListener to listen for incomming TCP connection 	
@@ -102,7 +103,7 @@ public class TCPServer : MonoBehaviour
             Debug.Log("Server is listening");
             Byte[] bytes = new Byte[1024];
             //bool received = false; 
-            while (true)
+            while (abierto)
             {
                 using (connectedTcpClient = tcpListener.AcceptTcpClient())
                 {
@@ -141,7 +142,7 @@ public class TCPServer : MonoBehaviour
 
     private void ProcessData2ndPlayer()
     {
-        while (true)
+        while (abierto)
         {
             checkAndChange(ref IAPos, ref IAShootPos, ref IARot, ref IAdidshoot, ref IAlive);
         }
@@ -204,6 +205,7 @@ public class TCPServer : MonoBehaviour
     public void EndThreadsComunications()
     {
         Debug.Log("CerrandoServer");
+        abierto = false;
         tcpListenerThread.Abort();
         cambiadorDePosiciones.Abort();
     }

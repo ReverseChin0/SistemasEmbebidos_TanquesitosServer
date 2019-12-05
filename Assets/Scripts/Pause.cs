@@ -35,4 +35,5 @@ public class Pause : MonoBehaviour
         }
         SceneManager.LoadScene("Menu"); 
     }
+
 }
