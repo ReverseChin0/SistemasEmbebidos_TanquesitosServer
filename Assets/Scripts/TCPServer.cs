@@ -130,10 +130,10 @@ public class TCPServer : MonoBehaviour
     {
         if (mensajeMasNuevo != null)
         {
-            IAPos = _IAPos;
-            IAShootPos = _IAShPos;
-            IARot = _IARot;
-            IAdidshoot = _IAdidshoot;
+            _IAPos = mensajeMasNuevo.PosicionFinal;
+            _IAShPos = mensajeMasNuevo.PosicionDisparo;
+            _IARot = mensajeMasNuevo.rotacionFinal; ;
+            _IAdidshoot = mensajeMasNuevo.didshoot; ;
         }
         /*while(mensajesEnCola.Count > 0)
         {
@@ -181,6 +181,7 @@ public class TCPServer : MonoBehaviour
 
     public void EndThreadsComunications()
     {
+        Debug.Log("CerrandoServer");
         tcpListenerThread.Abort();
         cambiadorDePosiciones.Abort();
     }

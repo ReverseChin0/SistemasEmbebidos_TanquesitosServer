@@ -96,7 +96,7 @@ public class TCPClient : MonoBehaviour
                         MsgClass clasePrueba = JsonUtility.FromJson<MsgClass>(serverMessage);
                         mensajeMasNuevo = clasePrueba;
                         //mensajesEnCola.Enqueue(clasePrueba);
-                        Debug.Log("del server llego " + clasePrueba);
+                        //Debug.Log("del server llego " + clasePrueba);
                     }
                 }
             }
@@ -119,10 +119,10 @@ public class TCPClient : MonoBehaviour
     {
         if (mensajeMasNuevo != null) 
         {
-            IAPos = _IAPos;
-            IAShootPos = _IAShPos;
-            IARot = _IARot;
-            IAdidshoot = _IAdidshoot;
+            _IAPos = mensajeMasNuevo.PosicionFinal;
+            _IAShPos = mensajeMasNuevo.PosicionDisparo;
+            _IARot = mensajeMasNuevo.rotacionFinal; ;
+            _IAdidshoot = mensajeMasNuevo.didshoot; ;
         }
         /*while (mensajesEnCola.Count > 0)
         {
@@ -137,6 +137,7 @@ public class TCPClient : MonoBehaviour
     public void trySendingMsg(MsgClass msg)
     {
         SendMessage(msg);
+        
     }
     /// <summary> 	
     /// Send message to server using socket connection. 	
@@ -162,7 +163,8 @@ public class TCPClient : MonoBehaviour
                 // Convert string message to byte array.                 
                 byte[] clientMessageAsByteArray = Encoding.ASCII.GetBytes(json);
                 // Write byte array to socketConnection stream.      
-                Debug.Log("Client tryed to send msg");
+               // Debug.Log("Client tryed to send msg");
+                Debug.Log(json);
                 stream.Write(clientMessageAsByteArray, 0, clientMessageAsByteArray.Length);
             }
         }
@@ -174,6 +176,7 @@ public class TCPClient : MonoBehaviour
 
     public void EndThreadsComunications() 
     {
+        Debug.Log("CerrandoCliente");
         clientReceiveThread.Abort();
         cambiadorDePosiciones.Abort();
     }

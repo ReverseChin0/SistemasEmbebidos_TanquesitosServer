@@ -35,14 +35,15 @@ public class TankManager : MonoBehaviour
         RigBo = GetComponent<Rigidbody>();
         Stop();
 
-        if (isServer)
+        if (isServer && !IAPlayer)
         {
             myServer = FindObjectOfType<TCPServer>();
         }
-        else
+        else if(!isServer && !IAPlayer)
         {
             myClient = FindObjectOfType<TCPClient>();
         }
+        //StartCoroutine(SendMssgs());
     }
 
     void Update()
@@ -50,7 +51,7 @@ public class TankManager : MonoBehaviour
         if (!IAPlayer && hasFuel)
         {
             TankMovimiento();
-            SendMssgToBoss(new MsgClass(transform.position,EndCannon.position,transform.rotation,didShoot));
+            SendMssgToBoss(new MsgClass(transform.position, EndCannon.position, transform.rotation, didShoot));
             if (Combustible <= 0)
             {
                 hasFuel = false;
@@ -92,6 +93,7 @@ public class TankManager : MonoBehaviour
         Go.GetComponent<Bullet>().Shoot(EndCannon.forward,this);
         Stop();
         didShoot = true;
+        SendMssgToBoss(new MsgClass(transform.position, EndCannon.position, transform.rotation, didShoot));
     }
 
     void Stop()
@@ -198,6 +200,13 @@ public class TankManager : MonoBehaviour
         gameObject.SetActive(false);
     }
     
+    /*IEnumerator SendMssgs()
+    {
+        yield return new WaitForSeconds(0.05f);
+        SendMssgToBoss(new MsgClass(transform.position, EndCannon.position, transform.rotation, false));
+        StartCoroutine(SendMssgs());
+    }*/
+
     void SendMssgToBoss(MsgClass _msg)
     {
         if (isServer)
