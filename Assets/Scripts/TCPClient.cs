@@ -24,7 +24,7 @@ public class TCPClient : MonoBehaviour
     Transform MyTank, EndCannon;
     Vector3 IAPos, IAShootPos;
     Quaternion IARot;
-    bool IAdidshoot;
+    bool IAdidshoot, IAlive;
     //============================DataIA====================================
 
     void Start()
@@ -35,6 +35,7 @@ public class TCPClient : MonoBehaviour
         IAShootPos = tank.EndCannon.position;
         IARot = MyTank.rotation;
         IAdidshoot = false;
+        IAlive = true;
     }
 
     public void InitializeConnection(string _IP, int _port)
@@ -49,6 +50,19 @@ public class TCPClient : MonoBehaviour
         MyTank.position = IAPos;
         EndCannon.position = IAShootPos;
         MyTank.rotation = IARot;
+        if (IAdidshoot)
+        {
+            tank.Shoot();
+            IAdidshoot = false;
+            //mensajeMasNuevo = null;
+            mensajeMasNuevo = new MsgClass(IAPos, IAShootPos, IARot, IAdidshoot, IAlive);
+        }
+        if (!IAlive)
+        {
+            tank.gameObject.SetActive(false);
+            //mensajeMasNuevo = null;
+            mensajeMasNuevo = new MsgClass(IAPos, IAShootPos, IARot, IAdidshoot, IAlive);
+        }
     }
     /// <summary> 	
     /// Setup socket connection. 	
@@ -93,10 +107,16 @@ public class TCPClient : MonoBehaviour
                         Array.Copy(bytes, 0, incommingData, 0, length);
                         // Convert byte array to string message. 						
                         string serverMessage = Encoding.ASCII.GetString(incommingData);
-                        MsgClass clasePrueba = JsonUtility.FromJson<MsgClass>(serverMessage);
-                        mensajeMasNuevo = clasePrueba;
+                        Debug.Log("del server llego " + serverMessage);
+                        try
+                        {
+                            MsgClass clasePrueba = JsonUtility.FromJson<MsgClass>(serverMessage);
+                            mensajeMasNuevo = clasePrueba;
+                        }catch(Exception ex)
+                        {
+
+                        }
                         //mensajesEnCola.Enqueue(clasePrueba);
-                        //Debug.Log("del server llego " + clasePrueba);
                     }
                 }
             }
@@ -111,18 +131,21 @@ public class TCPClient : MonoBehaviour
     {
         while (true)
         {
-            checkAndChange(ref IAPos, ref IAShootPos, ref IARot, ref IAdidshoot);
+            checkAndChange(ref IAPos, ref IAShootPos, ref IARot, ref IAdidshoot, ref IAlive);
         }
     }
 
-    public void checkAndChange(ref Vector3 _IAPos,ref Vector3 _IAShPos,ref Quaternion _IARot,ref bool _IAdidshoot)
+    public void checkAndChange(ref Vector3 _IAPos,ref Vector3 _IAShPos,ref Quaternion _IARot,ref bool _IAdidshoot, ref bool _alive)
     {
-        if (mensajeMasNuevo != null) 
+
+        if (mensajeMasNuevo != null)
         {
+            Debug.Log(mensajeMasNuevo.PosicionFinal + " " + mensajeMasNuevo.PosicionDisparo);
             _IAPos = mensajeMasNuevo.PosicionFinal;
             _IAShPos = mensajeMasNuevo.PosicionDisparo;
-            _IARot = mensajeMasNuevo.rotacionFinal; ;
-            _IAdidshoot = mensajeMasNuevo.didshoot; ;
+            _IARot = mensajeMasNuevo.rotacionFinal;
+            _IAdidshoot = mensajeMasNuevo.didshoot;
+            _alive = mensajeMasNuevo.alive;
         }
         /*while (mensajesEnCola.Count > 0)
         {
@@ -137,7 +160,6 @@ public class TCPClient : MonoBehaviour
     public void trySendingMsg(MsgClass msg)
     {
         SendMessage(msg);
-        
     }
     /// <summary> 	
     /// Send message to server using socket connection. 	
@@ -164,7 +186,7 @@ public class TCPClient : MonoBehaviour
                 byte[] clientMessageAsByteArray = Encoding.ASCII.GetBytes(json);
                 // Write byte array to socketConnection stream.      
                // Debug.Log("Client tryed to send msg");
-                Debug.Log(json);
+                //Debug.Log(json);
                 stream.Write(clientMessageAsByteArray, 0, clientMessageAsByteArray.Length);
             }
         }

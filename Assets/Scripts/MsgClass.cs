@@ -5,16 +5,18 @@ using UnityEngine;
 [System.Serializable]
 public class MsgClass 
 {
+    
     public Vector3 PosicionFinal, PosicionDisparo;
     public Quaternion rotacionFinal;
-    public bool didshoot;
+    public bool didshoot, alive;
 
-    public MsgClass(Vector3 _pos, Vector3 _posDisp, Quaternion _rotfinal, bool _didshoot)
+    public MsgClass(Vector3 _pos, Vector3 _posDisp, Quaternion _rotfinal, bool _didshoot, bool _alive)
     {
         PosicionFinal = _pos;
         PosicionDisparo = _posDisp;
         rotacionFinal = _rotfinal;
         didshoot = _didshoot;
+        alive = _alive;
     }
 
     public MsgClass(Vector3 _pos, Vector3 _posDisp, Quaternion _rotfinal)

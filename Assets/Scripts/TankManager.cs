@@ -26,8 +26,10 @@ public class TankManager : MonoBehaviour
     [Range(0.1f, 2f)]
     public float gastoFuel = 0.1f;
 
-    public bool IAPlayer = false, didShoot=false, isServer = false;
+    public bool IAPlayer = false, isServer = false;
     public int playerID = 0, Thealth = 100;
+
+    float Timer = 0.0f, interval=0.06f, newtime=1.0f;
 
     void Start()
     {
@@ -51,7 +53,7 @@ public class TankManager : MonoBehaviour
         if (!IAPlayer && hasFuel)
         {
             TankMovimiento();
-            SendMssgToBoss(new MsgClass(transform.position, EndCannon.position, transform.rotation, didShoot));
+            //SendMssgToBoss(new MsgClass(transform.position, EndCannon.position, transform.rotation, didShoot));
             if (Combustible <= 0)
             {
                 hasFuel = false;
@@ -62,7 +64,12 @@ public class TankManager : MonoBehaviour
             {
                 RegenerateFuel();
             }
-            didShoot = false;
+            Timer += Time.deltaTime;
+            if (Timer >= newtime)
+            {
+                newtime = Timer + interval;
+                SendMssgToBoss(new MsgClass(transform.position, EndCannon.position, transform.rotation, false , true));
+            }
         }
         else if(!hasFuel)
         {
@@ -91,9 +98,14 @@ public class TankManager : MonoBehaviour
         //TurnManager.instancia.turnOffLine(true);
         GameObject Go = Instantiate(Bullet, EndCannon.position, transform.rotation);
         Go.GetComponent<Bullet>().Shoot(EndCannon.forward,this);
-        Stop();
-        didShoot = true;
-        SendMssgToBoss(new MsgClass(transform.position, EndCannon.position, transform.rotation, didShoot));
+       //Stop();
+        
+        if (!IAPlayer)
+        {
+            newtime = Timer + interval;
+            SendMssgToBoss(new MsgClass(transform.position, EndCannon.position, transform.rotation, true, true));
+        }
+        
     }
 
     void Stop()
@@ -180,17 +192,22 @@ public class TankManager : MonoBehaviour
         hasFuel = true;
         Combustible = 10.0f;
         fuelImage.fillAmount = 1;
-        didShoot = false;
+        //didShoot = false;
     }
 
     public void TakeDMG(int dmg)
     {
-        Thealth = Thealth - dmg;
-        RigBo.velocity = Vector3.zero;
-        Debug.Log("Soy " + playerID + " y mi salud es " + Thealth);
-        if (Thealth <= 0)
+        if (!IAPlayer)
         {
-            Die();
+            Thealth = Thealth - dmg;
+            RigBo.velocity = Vector3.zero;
+            Debug.Log("Soy " + playerID + " y mi salud es " + Thealth);
+            if (Thealth <= 0)
+            {
+                Die();
+                newtime = Timer + interval;
+                SendMssgToBoss(new MsgClass(transform.position, EndCannon.position, transform.rotation, true, false));
+            }
         }
     }
 

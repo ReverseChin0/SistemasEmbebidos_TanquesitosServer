@@ -15,7 +15,6 @@ public class Pause : MonoBehaviour
         pauseMenuM.SetActive(!pauseMenuM.activeSelf);
     }
 
-
     private void Update()
     {
         if (canPause && Input.GetKeyDown(KeyCode.P))

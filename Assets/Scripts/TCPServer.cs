@@ -40,7 +40,7 @@ public class TCPServer : MonoBehaviour
     Transform MyTank, EndCannon;
     Vector3 IAPos, IAShootPos;
     Quaternion IARot;
-    bool IAdidshoot;
+    bool IAdidshoot, IAlive;
     //============================DataIA====================================
     void Start()
     {
@@ -50,6 +50,7 @@ public class TCPServer : MonoBehaviour
         IAShootPos = tank.EndCannon.position;
         IARot = MyTank.rotation;
         IAdidshoot = false;
+        IAlive = true;
     }
 
     public void InitializeConnection(string _IP, int _port)
@@ -70,6 +71,20 @@ public class TCPServer : MonoBehaviour
         MyTank.position = IAPos;
         EndCannon.position = IAShootPos;
         MyTank.rotation = IARot;
+        if (IAdidshoot)
+        {
+            tank.Shoot();
+            IAdidshoot = false;
+            //mensajeMasNuevo = null;
+            mensajeMasNuevo = new MsgClass(IAPos, IAShootPos, IARot, IAdidshoot, IAlive);
+        }
+        if (!IAlive)
+        {
+            tank.gameObject.SetActive(false);
+            //mensajeMasNuevo = null;
+            mensajeMasNuevo = new MsgClass(IAPos, IAShootPos, IARot, IAdidshoot, IAlive);
+        }
+
     }
 
     /// <summary> 	
@@ -103,9 +118,15 @@ public class TCPServer : MonoBehaviour
                             // Convert byte array to string message. 							
                             string clientMessage = Encoding.ASCII.GetString(incommingData);
                             Debug.Log("client message received as: " + clientMessage);
-                            MsgClass clasePrueba = JsonUtility.FromJson<MsgClass>(clientMessage);
-                            //mensajesEnCola.Enqueue(clasePrueba);
-                            mensajeMasNuevo = clasePrueba;
+                            try
+                            {
+                                MsgClass clasePrueba = JsonUtility.FromJson<MsgClass>(clientMessage);
+                                mensajeMasNuevo = clasePrueba;
+                            }
+                            catch (Exception ex)
+                            {
+
+                            }
                         }
                     }
                 }
@@ -122,18 +143,19 @@ public class TCPServer : MonoBehaviour
     {
         while (true)
         {
-            checkAndChange(ref IAPos, ref IAShootPos, ref IARot, ref IAdidshoot);
+            checkAndChange(ref IAPos, ref IAShootPos, ref IARot, ref IAdidshoot, ref IAlive);
         }
     }
 
-    public void checkAndChange(ref Vector3 _IAPos, ref Vector3 _IAShPos, ref Quaternion _IARot, ref bool _IAdidshoot)
+    public void checkAndChange(ref Vector3 _IAPos, ref Vector3 _IAShPos, ref Quaternion _IARot, ref bool _IAdidshoot, ref bool _alive)
     {
         if (mensajeMasNuevo != null)
         {
             _IAPos = mensajeMasNuevo.PosicionFinal;
             _IAShPos = mensajeMasNuevo.PosicionDisparo;
-            _IARot = mensajeMasNuevo.rotacionFinal; ;
-            _IAdidshoot = mensajeMasNuevo.didshoot; ;
+            _IARot = mensajeMasNuevo.rotacionFinal; 
+            _IAdidshoot = mensajeMasNuevo.didshoot;
+            _alive = mensajeMasNuevo.alive;
         }
         /*while(mensajesEnCola.Count > 0)
         {
